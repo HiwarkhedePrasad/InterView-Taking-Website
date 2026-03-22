@@ -1,1693 +1,602 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>InterviewOS — AI-Powered Interview Platform</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300&display=swap" rel="stylesheet" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>InterviewOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,300;0,400;0,700;0,900;1,700;1,900&family=Instrument+Serif:ital@0;1&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --paper:#f0ebe0;
+  --paper-2:#e8e0ce;
+  --ink:#0f0d0a;
+  --ink-2:#3a3530;
+  --ink-3:#7a7060;
+  --rule:#c8bfaa;
+  --red:#c0390b;
+  --red-dim:#8a2a08;
+  --red-pale:#f5ddd6;
+  --green:#2d5a1b;
+  --green-pale:#daebd3;
+  --f-cond:'Barlow Condensed',sans-serif;
+  --f-serif:'Instrument Serif',serif;
+  --f-mono:'Share Tech Mono',monospace;
+}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--f-mono);
+  font-size:14px;
+  line-height:1.5;
+  overflow-x:hidden;
+  cursor:crosshair;
+}
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 27px,rgba(15,13,10,0.04) 27px,rgba(15,13,10,0.04) 28px);
+  pointer-events:none;z-index:0;
+}
 
-  <style>
-    /* ─── TOKENS ─────────────────────────────── */
-    :root {
-      --bg: #0a0a08;
-      --surface: #111110;
-      --surface-2: #181816;
-      --border: #252521;
-      --border-bright: #38382f;
+/* ── MASTHEAD ── */
+.masthead{position:relative;z-index:10;padding:0 32px;border-bottom:2px solid var(--ink);}
+.mast-top{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 0;border-bottom:1px solid var(--rule);
+  font-size:11px;color:var(--ink-3);letter-spacing:0.08em;text-transform:uppercase;
+}
+.mast-center{
+  display:grid;grid-template-columns:1fr auto 1fr;
+  align-items:end;padding:16px 0 12px;gap:16px;
+}
+.mast-kicker{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-3);line-height:1.4;align-self:flex-end;}
+.mast-kicker span{display:block;color:var(--red);font-size:10px;margin-bottom:4px;}
+.mast-title{
+  font-family:var(--f-cond);font-weight:900;
+  font-size:clamp(64px,10vw,120px);letter-spacing:-3px;line-height:0.88;
+  text-align:center;text-transform:uppercase;user-select:none;
+}
+.mast-title em{font-style:italic;color:var(--red);}
+.mast-right{text-align:right;font-size:11px;color:var(--ink-3);letter-spacing:0.06em;align-self:flex-end;line-height:1.8;}
+.mast-bottom{display:flex;align-items:center;gap:0;padding:8px 0;border-top:1px solid var(--rule);overflow:hidden;}
+.mast-tag{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap;padding:0 16px;border-right:1px solid var(--rule);}
+.mast-tag:first-child{padding-left:0;}
+.mast-tag.red{color:var(--red);}
 
-      --ink: #f0ede6;
-      --ink-2: #a8a49a;
-      --ink-3: #5c5a52;
+/* ── TICKER ── */
+.ticker{background:var(--ink);color:var(--paper);overflow:hidden;padding:7px 0;border-bottom:2px solid var(--ink);}
+.ticker-inner{display:flex;gap:56px;width:max-content;animation:tick 22s linear infinite;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;}
+.ticker-item{white-space:nowrap;display:flex;align-items:center;gap:10px;}
+.ticker-sep{color:var(--red);font-size:14px;}
+@keyframes tick{from{transform:translateX(0);}to{transform:translateX(-50%);}}
 
-      --gold: #c9a84c;
-      --gold-dim: #8a6f2e;
-      --gold-bright: #e8c96e;
-      --ember: #d4540a;
-      --sage: #5c7a4e;
-      --sage-bright: #7db06b;
+/* ── FRONT PAGE ── */
+.broadsheet{position:relative;z-index:1;}
+.front{display:grid;grid-template-columns:2fr 1fr;border-bottom:2px solid var(--ink);}
+.front-main{border-right:2px solid var(--ink);padding:32px;}
+.front-aside{padding:24px;display:flex;flex-direction:column;gap:0;}
 
-      --r4: 4px;
-      --r8: 8px;
-      --r16: 16px;
+.overline{font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--red);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.overline::before{content:'';display:block;width:24px;height:2px;background:var(--red);flex-shrink:0;}
 
-      --font-display: 'Syne', sans-serif;
-      --font-mono: 'JetBrains Mono', monospace;
-      --font-body: 'Fraunces', serif;
+.headline{font-family:var(--f-cond);font-weight:900;font-size:clamp(42px,5vw,72px);line-height:0.95;letter-spacing:-1.5px;text-transform:uppercase;margin-bottom:20px;}
+.headline em{font-style:italic;font-family:var(--f-serif);font-weight:400;text-transform:none;color:var(--ink-2);font-size:0.85em;letter-spacing:0;}
 
-      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-    }
+.deck{font-family:var(--f-serif);font-size:19px;line-height:1.55;color:var(--ink-2);max-width:560px;margin-bottom:24px;border-left:3px solid var(--red);padding-left:16px;}
 
-    /* ─── RESET ──────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      background: var(--bg);
-      color: var(--ink);
-      font-family: var(--font-body);
-      font-size: 17px;
-      line-height: 1.65;
-      overflow-x: hidden;
-      cursor: none;
-    }
-    a { color: inherit; text-decoration: none; }
-    img { display: block; max-width: 100%; }
-    button { cursor: none; font: inherit; border: none; background: none; }
+.byline{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:28px;display:flex;align-items:center;gap:16px;}
+.byline::after{content:'';flex:1;height:1px;background:var(--rule);}
 
-    /* ─── CURSOR ─────────────────────────────── */
-    #cursor {
-      position: fixed;
-      width: 10px; height: 10px;
-      background: var(--gold);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9999;
-      transform: translate(-50%, -50%);
-      transition: width 0.2s var(--ease-out), height 0.2s var(--ease-out), background 0.2s;
-      mix-blend-mode: exclusion;
-    }
-    #cursor-ring {
-      position: fixed;
-      width: 36px; height: 36px;
-      border: 1.5px solid var(--gold-dim);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9998;
-      transform: translate(-50%, -50%);
-      transition: transform 0.08s linear, width 0.25s var(--ease-out), height 0.25s var(--ease-out), opacity 0.2s;
-    }
-    body:hover #cursor { opacity: 1; }
-    .hoverable:hover ~ #cursor,
-    .hoverable:hover + #cursor { width: 20px; height: 20px; }
+.terminal{background:var(--ink);padding:20px 24px;font-family:var(--f-mono);font-size:12px;line-height:1.8;color:#c8bfaa;position:relative;margin-bottom:24px;}
+.terminal::before{content:'$ InterviewOS — session #2847';display:block;color:var(--red);margin-bottom:12px;letter-spacing:0.06em;font-size:11px;}
+.term-agent{color:#e8c96e;}
+.term-cursor{display:inline-block;width:8px;height:13px;background:#c8bfaa;vertical-align:middle;margin-left:2px;animation:blink 1s step-end infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
 
-    /* ─── GRAIN OVERLAY ──────────────────────── */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
-      opacity: 0.04;
-      pointer-events: none;
-      z-index: 999;
-    }
+.cta-strip{display:flex;align-items:center;gap:12px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:14px 0;}
+.btn-ink{font-family:var(--f-cond);font-weight:700;font-size:14px;letter-spacing:0.06em;text-transform:uppercase;padding:10px 24px;background:var(--ink);color:var(--paper);border:2px solid var(--ink);text-decoration:none;transition:background 0.15s,color 0.15s;display:inline-block;}
+.btn-ink:hover{background:var(--red);border-color:var(--red);}
+.btn-outline{font-family:var(--f-cond);font-weight:700;font-size:14px;letter-spacing:0.06em;text-transform:uppercase;padding:10px 24px;background:transparent;color:var(--ink);border:2px solid var(--ink);text-decoration:none;transition:background 0.15s,color 0.15s;display:inline-block;}
+.btn-outline:hover{background:var(--ink);color:var(--paper);}
+.cta-note{font-size:11px;color:var(--ink-3);letter-spacing:0.06em;}
 
-    /* ─── NAV ────────────────────────────────── */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      padding: 20px 48px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid transparent;
-      transition: border-color 0.3s, background 0.3s, padding 0.3s;
-    }
-    nav.scrolled {
-      border-color: var(--border);
-      background: rgba(10,10,8,0.88);
-      backdrop-filter: blur(12px);
-      padding: 14px 48px;
-    }
-    .nav-logo {
-      font-family: var(--font-display);
-      font-weight: 800;
-      font-size: 18px;
-      letter-spacing: -0.5px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .nav-logo-mark {
-      width: 28px; height: 28px;
-      background: var(--gold);
-      border-radius: 6px;
-      display: grid;
-      place-items: center;
-    }
-    .nav-logo-mark svg { width: 14px; height: 14px; }
-    .nav-links {
-      display: flex;
-      gap: 36px;
-      list-style: none;
-      font-family: var(--font-mono);
-      font-size: 12px;
-      letter-spacing: 0.08em;
-      color: var(--ink-2);
-    }
-    .nav-links a { transition: color 0.2s; }
-    .nav-links a:hover { color: var(--ink); }
-    .nav-cta {
-      font-family: var(--font-display);
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      padding: 10px 22px;
-      background: var(--gold);
-      color: #0a0a08;
-      border-radius: var(--r4);
-      transition: background 0.2s, transform 0.15s;
-    }
-    .nav-cta:hover { background: var(--gold-bright); transform: translateY(-1px); }
+/* ASIDE */
+.aside-block{border-bottom:1px solid var(--rule);padding:20px 0;}
+.aside-block:last-child{border-bottom:none;}
+.aside-label{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--red);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.aside-label::after{content:'';flex:1;height:1px;background:var(--rule);}
+.agent-line{display:flex;align-items:baseline;gap:8px;padding:7px 0;border-bottom:1px dashed var(--rule);font-size:12px;}
+.agent-line:last-child{border-bottom:none;}
+.agent-num{font-family:var(--f-cond);font-weight:700;font-size:20px;line-height:1;min-width:24px;color:var(--rule);}
+.agent-nm{font-family:var(--f-cond);font-weight:700;font-size:16px;text-transform:uppercase;letter-spacing:-0.3px;}
+.agent-role-tag{font-size:10px;color:var(--ink-3);letter-spacing:0.06em;}
+.stat-row{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:1px dotted var(--rule);font-size:11px;color:var(--ink-3);letter-spacing:0.04em;}
+.stat-row:last-child{border-bottom:none;}
+.stat-val{font-family:var(--f-cond);font-weight:700;font-size:22px;color:var(--ink);letter-spacing:-0.5px;}
+.pullquote{font-family:var(--f-cond);font-style:italic;font-weight:700;font-size:26px;line-height:1.1;letter-spacing:-0.5px;color:var(--red);border-top:3px solid var(--red);border-bottom:3px solid var(--red);padding:12px 0;margin:20px 0;text-align:center;}
 
-    /* ─── HERO ───────────────────────────────── */
-    .hero {
-      min-height: 100vh;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      align-items: center;
-      padding: 120px 48px 80px;
-      gap: 48px;
-      position: relative;
-      overflow: hidden;
-    }
+/* COLUMNS */
+.features-hed{padding:24px 32px 0;border-bottom:2px solid var(--ink);}
+.features-hed-inner{display:flex;align-items:flex-end;justify-content:space-between;padding-bottom:12px;}
+.section-hed{font-family:var(--f-cond);font-weight:900;font-size:clamp(28px,4vw,52px);letter-spacing:-1px;text-transform:uppercase;line-height:1;}
+.section-hed em{font-style:italic;color:var(--red);}
+.section-count{font-family:var(--f-cond);font-weight:300;font-size:80px;color:var(--rule);line-height:1;letter-spacing:-3px;}
+.columns{display:grid;grid-template-columns:repeat(5,1fr);border-bottom:2px solid var(--ink);}
+.col{border-right:1px solid var(--rule);padding:24px 20px;}
+.col:last-child{border-right:none;}
+.col-num{font-family:var(--f-cond);font-weight:900;font-size:48px;color:transparent;line-height:1;letter-spacing:-2px;margin-bottom:8px;-webkit-text-stroke:1px var(--rule);}
+.col-title{font-family:var(--f-cond);font-weight:700;font-size:17px;text-transform:uppercase;letter-spacing:-0.3px;line-height:1.1;margin-bottom:10px;border-bottom:2px solid var(--ink);padding-bottom:8px;}
+.col-body{font-size:12px;line-height:1.65;color:var(--ink-2);}
+.col-tag{display:inline-block;margin-top:12px;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;padding:3px 8px;border:1px solid;}
+.col-tag-red{border-color:var(--red-dim);color:var(--red);}
+.col-tag-grn{border-color:#3d5934;color:var(--green);}
+.col-tag-ink{border-color:var(--ink-3);color:var(--ink-2);}
 
-    /* Radial glow */
-    .hero::after {
-      content: '';
-      position: absolute;
-      width: 600px; height: 600px;
-      background: radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%);
-      top: 50%; left: 55%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-    }
+/* AGENTS */
+.agents-section{border-bottom:2px solid var(--ink);}
+.agents-hed{padding:20px 32px;border-bottom:2px solid var(--ink);display:flex;align-items:center;gap:24px;}
+.agents-hed-title{font-family:var(--f-cond);font-weight:900;font-size:clamp(24px,3.5vw,44px);text-transform:uppercase;letter-spacing:-1px;}
+.agents-hed-sub{font-size:12px;color:var(--ink-3);max-width:360px;line-height:1.5;border-left:1px solid var(--rule);padding-left:24px;}
+.agents-spread{display:grid;grid-template-columns:repeat(3,1fr);}
+.agent-spread-card{border-right:1px solid var(--rule);padding:0;overflow:hidden;transition:background 0.2s;}
+.agent-spread-card:last-child{border-right:none;}
+.agent-spread-card:hover{background:var(--paper-2);}
+.asc-top{padding:24px 24px 0;display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;}
+.asc-initial{font-family:var(--f-cond);font-weight:900;font-size:88px;line-height:0.85;letter-spacing:-4px;user-select:none;-webkit-text-stroke:2px;}
+.init-peer{color:transparent;-webkit-text-stroke-color:var(--green);}
+.init-lead{color:transparent;-webkit-text-stroke-color:var(--red);}
+.init-vet{color:transparent;-webkit-text-stroke-color:var(--ink);}
+.asc-tag{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;writing-mode:vertical-rl;color:var(--ink-3);padding:8px 0;}
+.asc-body{padding:0 24px 24px;}
+.asc-name{font-family:var(--f-cond);font-weight:900;font-size:28px;text-transform:uppercase;letter-spacing:-0.8px;border-top:2px solid var(--ink);padding-top:12px;margin-bottom:4px;}
+.asc-role{font-size:11px;color:var(--ink-3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:14px;}
+.asc-desc{font-size:12px;line-height:1.65;color:var(--ink-2);margin-bottom:16px;}
+.asc-focus{font-size:11px;color:var(--ink-3);border-top:1px dashed var(--rule);padding-top:12px;line-height:1.7;}
+.asc-focus b{color:var(--ink);font-weight:normal;font-family:var(--f-cond);font-size:12px;text-transform:uppercase;letter-spacing:0.04em;}
+.asc-wave{display:flex;align-items:flex-end;gap:3px;height:28px;margin-bottom:12px;}
+.wbar{width:4px;border-radius:1px;transition:height 0.3s ease;}
+.peer-wave .wbar{background:rgba(45,90,27,0.4);}
+.lead-wave .wbar{background:rgba(192,57,11,0.35);}
+.vet-wave  .wbar{background:rgba(15,13,10,0.25);}
 
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--gold);
-      border: 1px solid var(--gold-dim);
-      padding: 6px 14px;
-      border-radius: 100px;
-      margin-bottom: 28px;
-      opacity: 0;
-      animation: fadeUp 0.7s var(--ease-out) 0.1s forwards;
-    }
-    .hero-badge::before {
-      content: '';
-      width: 6px; height: 6px;
-      background: var(--gold);
-      border-radius: 50%;
-      animation: pulse 2s ease-in-out infinite;
-    }
+/* FLOW */
+.flow-section{display:grid;grid-template-columns:80px 1fr;border-bottom:2px solid var(--ink);min-height:360px;}
+.flow-rotlabel{background:var(--ink);display:flex;align-items:center;justify-content:center;border-right:2px solid var(--ink);}
+.flow-rotlabel span{writing-mode:vertical-rl;transform:rotate(180deg);font-family:var(--f-cond);font-weight:900;font-size:16px;letter-spacing:0.15em;text-transform:uppercase;color:var(--paper);}
+.flow-inner{display:grid;grid-template-columns:repeat(4,1fr);}
+.flow-card{border-right:1px solid var(--rule);padding:28px 24px;position:relative;transition:background 0.2s;}
+.flow-card:last-child{border-right:none;}
+.flow-card:hover{background:var(--paper-2);}
+.flow-index{font-family:var(--f-cond);font-weight:900;font-size:64px;color:transparent;line-height:1;letter-spacing:-3px;margin-bottom:12px;-webkit-text-stroke:1.5px var(--rule);transition:color 0.2s,-webkit-text-stroke-color 0.2s;}
+.flow-card:hover .flow-index{color:var(--red);-webkit-text-stroke-color:var(--red);}
+.flow-mode{font-family:var(--f-cond);font-weight:700;font-size:20px;text-transform:uppercase;letter-spacing:-0.3px;margin-bottom:8px;border-bottom:1px solid var(--rule);padding-bottom:8px;}
+.flow-desc{font-size:12px;line-height:1.65;color:var(--ink-2);}
+.flow-arrow{position:absolute;top:50%;right:-14px;transform:translateY(-50%);font-family:var(--f-cond);font-weight:900;font-size:20px;color:var(--rule);z-index:2;background:var(--paper);padding:2px 0;pointer-events:none;}
+.flow-card:last-child .flow-arrow{display:none;}
 
-    .hero-title {
-      font-family: var(--font-display);
-      font-size: clamp(48px, 5.5vw, 76px);
-      font-weight: 800;
-      line-height: 1.0;
-      letter-spacing: -2px;
-      color: var(--ink);
-      opacity: 0;
-      animation: fadeUp 0.8s var(--ease-out) 0.25s forwards;
-    }
-    .hero-title em {
-      font-style: italic;
-      font-family: var(--font-body);
-      font-weight: 300;
-      color: var(--gold);
-    }
+/* STACK + REPORT */
+.stack-section{display:grid;grid-template-columns:1fr 1fr;border-bottom:2px solid var(--ink);}
+.stack-left{border-right:2px solid var(--ink);padding:32px;}
+.stack-right{padding:32px;}
+.stack-hed{font-family:var(--f-cond);font-weight:900;font-size:clamp(24px,3vw,38px);text-transform:uppercase;letter-spacing:-0.8px;margin-bottom:24px;border-bottom:2px solid var(--ink);padding-bottom:12px;}
+.stack-hed em{font-style:italic;color:var(--red);}
+.tech-table{width:100%;border-collapse:collapse;font-size:12px;}
+.tech-table tr{border-bottom:1px dashed var(--rule);}
+.tech-table tr:last-child{border-bottom:none;}
+.tech-table td{padding:9px 0;vertical-align:top;}
+.tech-table td:first-child{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-3);width:100px;padding-right:16px;}
+.tech-badge{display:inline-block;background:var(--ink);color:var(--paper);font-size:10px;letter-spacing:0.06em;padding:2px 7px;margin-right:4px;margin-bottom:2px;}
+.tech-badge.red{background:var(--red);}
+.tech-badge.grn{background:var(--green);}
+.score-card{border:1px solid var(--rule);padding:16px;margin-bottom:10px;display:flex;gap:16px;align-items:flex-start;transition:border-color 0.2s;}
+.score-card:hover{border-color:var(--ink);}
+.sc-num{font-family:var(--f-cond);font-weight:900;font-size:40px;line-height:1;letter-spacing:-2px;min-width:52px;}
+.sc-hi{color:var(--green);}
+.sc-mid{color:var(--red-dim);}
+.sc-info{flex:1;}
+.sc-topic{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px;}
+.sc-text{font-size:12px;line-height:1.5;color:var(--ink-2);}
 
-    .hero-sub {
-      margin-top: 24px;
-      font-size: 18px;
-      line-height: 1.7;
-      color: var(--ink-2);
-      max-width: 480px;
-      opacity: 0;
-      animation: fadeUp 0.8s var(--ease-out) 0.4s forwards;
-    }
+/* FOOTER */
+.footer{background:var(--ink);color:var(--paper);padding:0 32px;}
+.footer-top{display:flex;align-items:center;justify-content:space-between;padding:20px 0;border-bottom:1px solid #2a2820;}
+.footer-logo{font-family:var(--f-cond);font-weight:900;font-size:32px;letter-spacing:-1px;text-transform:uppercase;}
+.footer-logo em{font-style:italic;color:var(--red);}
+.footer-links{display:flex;gap:0;list-style:none;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;}
+.footer-links li{padding:0 20px;border-right:1px solid #2a2820;color:#7a7060;}
+.footer-links li:first-child{padding-left:0;}
+.footer-links li:last-child{border-right:none;padding-right:0;}
+.footer-links a{color:inherit;text-decoration:none;transition:color 0.15s;}
+.footer-links a:hover{color:var(--paper);}
+.footer-bottom{padding:14px 0;font-size:11px;color:#3a3530;letter-spacing:0.06em;display:flex;justify-content:space-between;}
 
-    .hero-actions {
-      margin-top: 40px;
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      opacity: 0;
-      animation: fadeUp 0.8s var(--ease-out) 0.55s forwards;
-    }
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      font-family: var(--font-display);
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: 0.03em;
-      padding: 14px 28px;
-      background: var(--gold);
-      color: #0a0a08;
-      border-radius: var(--r4);
-      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-    }
-    .btn-primary:hover {
-      background: var(--gold-bright);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(201,168,76,0.25);
-    }
-    .btn-primary svg { width: 16px; height: 16px; }
-    .btn-ghost {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      letter-spacing: 0.08em;
-      color: var(--ink-2);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: color 0.2s;
-    }
-    .btn-ghost:hover { color: var(--ink); }
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity 0.7s ease,transform 0.7s ease;}
+.reveal.in{opacity:1;transform:translateY(0);}
+.reveal-l{opacity:0;transform:translateX(-20px);transition:opacity 0.7s ease,transform 0.7s ease;}
+.reveal-l.in{opacity:1;transform:translateX(0);}
+.reveal-r{opacity:0;transform:translateX(20px);transition:opacity 0.7s ease,transform 0.7s ease;}
+.reveal-r.in{opacity:1;transform:translateX(0);}
+.d1{transition-delay:0.1s;}.d2{transition-delay:0.2s;}.d3{transition-delay:0.3s;}.d4{transition-delay:0.4s;}
 
-    .hero-stats {
-      margin-top: 52px;
-      display: flex;
-      gap: 36px;
-      opacity: 0;
-      animation: fadeUp 0.8s var(--ease-out) 0.7s forwards;
-    }
-    .stat-item {
-      border-top: 1px solid var(--border-bright);
-      padding-top: 14px;
-    }
-    .stat-num {
-      font-family: var(--font-display);
-      font-size: 28px;
-      font-weight: 800;
-      color: var(--ink);
-      letter-spacing: -1px;
-    }
-    .stat-label {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--ink-3);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      margin-top: 2px;
-    }
-
-    /* ─── HERO PANEL (RIGHT SIDE) ────────────── */
-    .hero-panel {
-      position: relative;
-      opacity: 0;
-      animation: fadeLeft 0.9s var(--ease-out) 0.5s forwards;
-    }
-    .panel-window {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,168,76,0.05);
-    }
-    .panel-titlebar {
-      background: var(--surface-2);
-      border-bottom: 1px solid var(--border);
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .tbar-dots { display: flex; gap: 6px; }
-    .tbar-dots span {
-      width: 10px; height: 10px; border-radius: 50%;
-    }
-    .tbar-dots span:nth-child(1) { background: #ff5f57; }
-    .tbar-dots span:nth-child(2) { background: #febc2e; }
-    .tbar-dots span:nth-child(3) { background: #28c840; }
-    .tbar-title {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      color: var(--ink-3);
-      flex: 1;
-      text-align: center;
-    }
-    .panel-body { padding: 20px; }
-
-    /* Agent cards in hero */
-    .agents-grid { display: flex; flex-direction: column; gap: 10px; }
-    .agent-card {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--r8);
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      transition: border-color 0.2s;
-    }
-    .agent-card:hover { border-color: var(--border-bright); }
-    .agent-avatar {
-      width: 38px; height: 38px;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      font-family: var(--font-display);
-      font-weight: 700;
-      font-size: 14px;
-      flex-shrink: 0;
-    }
-    .av-peer { background: rgba(92,122,78,0.2); color: var(--sage-bright); }
-    .av-lead { background: rgba(201,168,76,0.15); color: var(--gold); }
-    .av-vet  { background: rgba(212,84,10,0.15); color: var(--ember); }
-
-    .agent-info { flex: 1; }
-    .agent-name {
-      font-family: var(--font-display);
-      font-weight: 600;
-      font-size: 13px;
-      color: var(--ink);
-    }
-    .agent-role {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      color: var(--ink-3);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      margin-top: 2px;
-    }
-    .agent-wave {
-      display: flex;
-      align-items: center;
-      gap: 2px;
-      height: 18px;
-    }
-    .wave-bar {
-      width: 3px;
-      background: var(--border-bright);
-      border-radius: 2px;
-      transition: height 0.1s;
-    }
-    .agent-card.speaking .wave-bar { background: var(--gold); animation: waveAnim 0.6s ease-in-out infinite; }
-    .agent-card.speaking .wave-bar:nth-child(2) { animation-delay: 0.1s; }
-    .agent-card.speaking .wave-bar:nth-child(3) { animation-delay: 0.2s; }
-    .agent-card.speaking .wave-bar:nth-child(4) { animation-delay: 0.15s; }
-    .agent-card.speaking .wave-bar:nth-child(5) { animation-delay: 0.05s; }
-
-    /* Transcript area */
-    .transcript-box {
-      margin-top: 14px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--r8);
-      padding: 16px;
-      font-family: var(--font-mono);
-      font-size: 11.5px;
-      line-height: 1.7;
-      min-height: 90px;
-    }
-    .t-agent { color: var(--gold); }
-    .t-text { color: var(--ink-2); }
-    .t-cursor {
-      display: inline-block;
-      width: 2px; height: 13px;
-      background: var(--gold);
-      vertical-align: middle;
-      margin-left: 2px;
-      animation: blink 1s step-end infinite;
-    }
-
-    /* ─── DIVIDER ─────────────────────────────── */
-    .section-divider {
-      width: 100%;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--border-bright), transparent);
-      margin: 0 48px;
-      width: calc(100% - 96px);
-    }
-
-    /* ─── MARQUEE ─────────────────────────────── */
-    .marquee-track {
-      overflow: hidden;
-      padding: 24px 0;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-    .marquee-inner {
-      display: flex;
-      gap: 64px;
-      width: max-content;
-      animation: marquee 28s linear infinite;
-    }
-    .marquee-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--ink-3);
-      white-space: nowrap;
-    }
-    .marquee-dot { width: 4px; height: 4px; background: var(--gold-dim); border-radius: 50%; }
-
-    /* ─── FEATURES ───────────────────────────── */
-    .section { padding: 96px 48px; }
-    .section-eyebrow {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 16px;
-    }
-    .section-title {
-      font-family: var(--font-display);
-      font-size: clamp(36px, 4vw, 56px);
-      font-weight: 800;
-      letter-spacing: -1.5px;
-      line-height: 1.05;
-      color: var(--ink);
-    }
-    .section-title em {
-      font-style: italic;
-      font-family: var(--font-body);
-      font-weight: 300;
-      color: var(--gold);
-    }
-
-    /* ─── FEATURE BENTO ──────────────────────── */
-    .bento-grid {
-      display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      grid-auto-rows: 64px;
-      gap: 16px;
-      margin-top: 56px;
-    }
-
-    .bento-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--r16);
-      padding: 28px;
-      overflow: hidden;
-      position: relative;
-      transition: border-color 0.25s, transform 0.25s var(--ease-out);
-    }
-    .bento-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(201,168,76,0.06), transparent 60%);
-      opacity: 0;
-      transition: opacity 0.3s;
-      pointer-events: none;
-    }
-    .bento-card:hover::before { opacity: 1; }
-    .bento-card:hover { border-color: var(--border-bright); transform: translateY(-3px); }
-
-    /* Spans */
-    .span-4 { grid-column: span 4; grid-row: span 4; }
-    .span-5 { grid-column: span 5; grid-row: span 4; }
-    .span-3 { grid-column: span 3; grid-row: span 4; }
-    .span-7 { grid-column: span 7; grid-row: span 4; }
-    .span-5r { grid-column: span 5; grid-row: span 3; }
-    .span-4r { grid-column: span 4; grid-row: span 3; }
-    .span-3r { grid-column: span 3; grid-row: span 3; }
-    .span-6 { grid-column: span 6; grid-row: span 4; }
-    .span-12 { grid-column: span 12; grid-row: span 2; }
-
-    .card-icon {
-      width: 40px; height: 40px;
-      border-radius: var(--r8);
-      display: grid;
-      place-items: center;
-      margin-bottom: 18px;
-    }
-    .icon-gold { background: rgba(201,168,76,0.12); color: var(--gold); }
-    .icon-ember { background: rgba(212,84,10,0.12); color: var(--ember); }
-    .icon-sage  { background: rgba(92,122,78,0.15); color: var(--sage-bright); }
-
-    .card-label {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--ink-3);
-      margin-bottom: 8px;
-    }
-    .card-title {
-      font-family: var(--font-display);
-      font-weight: 700;
-      font-size: 18px;
-      letter-spacing: -0.4px;
-      color: var(--ink);
-      line-height: 1.2;
-    }
-    .card-desc {
-      font-family: var(--font-body);
-      font-size: 14px;
-      line-height: 1.65;
-      color: var(--ink-2);
-      margin-top: 10px;
-    }
-
-    /* Mini code block */
-    .mini-code {
-      position: absolute;
-      bottom: 16px; right: 16px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--r4);
-      padding: 8px 12px;
-      font-family: var(--font-mono);
-      font-size: 10px;
-      color: var(--ink-3);
-      line-height: 1.8;
-    }
-    .mini-code .kw { color: var(--gold); }
-    .mini-code .str { color: var(--sage-bright); }
-    .mini-code .fn { color: var(--ember); }
-
-    /* Agent chip row */
-    .chip-row {
-      display: flex;
-      gap: 8px;
-      margin-top: 16px;
-      flex-wrap: wrap;
-    }
-    .chip {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 0.06em;
-      padding: 4px 10px;
-      border-radius: 100px;
-      border: 1px solid;
-      text-transform: uppercase;
-    }
-    .chip-gold { border-color: var(--gold-dim); color: var(--gold); background: rgba(201,168,76,0.06); }
-    .chip-sage { border-color: #3d5934; color: var(--sage-bright); background: rgba(92,122,78,0.08); }
-    .chip-ember { border-color: #6b2d0a; color: var(--ember); background: rgba(212,84,10,0.06); }
-
-    /* Score bar */
-    .score-list { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
-    .score-row { display: flex; flex-direction: column; gap: 4px; }
-    .score-label {
-      display: flex;
-      justify-content: space-between;
-      font-family: var(--font-mono);
-      font-size: 10px;
-      color: var(--ink-3);
-      letter-spacing: 0.06em;
-    }
-    .score-track {
-      height: 4px;
-      background: var(--border);
-      border-radius: 2px;
-      overflow: hidden;
-    }
-    .score-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--gold-dim), var(--gold));
-      border-radius: 2px;
-      transform-origin: left;
-      transform: scaleX(0);
-      transition: transform 1.2s var(--ease-out);
-    }
-    .score-fill.animated { transform: scaleX(1); }
-
-    /* Mode flow */
-    .flow-steps {
-      display: flex;
-      align-items: center;
-      gap: 0;
-      margin-top: 16px;
-    }
-    .flow-step {
-      flex: 1;
-      text-align: center;
-    }
-    .flow-step-dot {
-      width: 36px; height: 36px;
-      border-radius: 50%;
-      border: 1.5px solid var(--border-bright);
-      display: grid;
-      place-items: center;
-      margin: 0 auto 8px;
-      font-family: var(--font-mono);
-      font-size: 12px;
-      color: var(--ink-2);
-      background: var(--bg);
-      position: relative;
-      z-index: 1;
-    }
-    .flow-step.active .flow-step-dot {
-      border-color: var(--gold);
-      color: var(--gold);
-      box-shadow: 0 0 0 4px rgba(201,168,76,0.1);
-    }
-    .flow-step-label {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--ink-3);
-    }
-    .flow-step.active .flow-step-label { color: var(--gold); }
-    .flow-line {
-      height: 1px;
-      flex: 1;
-      background: var(--border);
-      margin-bottom: 24px;
-    }
-
-    /* ─── AGENTS SECTION ─────────────────────── */
-    .agents-section { padding: 96px 48px; background: var(--surface); }
-    .agents-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
-      margin-top: 56px;
-    }
-    .agent-profile {
-      border: 1px solid var(--border);
-      border-radius: var(--r16);
-      padding: 32px;
-      background: var(--bg);
-      position: relative;
-      overflow: hidden;
-      transition: transform 0.25s var(--ease-out), border-color 0.25s;
-    }
-    .agent-profile:hover { transform: translateY(-4px); border-color: var(--border-bright); }
-    .agent-profile::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 3px;
-    }
-    .profile-peer::after { background: linear-gradient(90deg, transparent, var(--sage-bright), transparent); }
-    .profile-lead::after { background: linear-gradient(90deg, transparent, var(--gold), transparent); }
-    .profile-vet::after  { background: linear-gradient(90deg, transparent, var(--ember), transparent); }
-
-    .profile-header {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-    .profile-avatar {
-      width: 52px; height: 52px;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      font-family: var(--font-display);
-      font-weight: 800;
-      font-size: 20px;
-    }
-    .profile-meta { flex: 1; }
-    .profile-name {
-      font-family: var(--font-display);
-      font-weight: 700;
-      font-size: 17px;
-      color: var(--ink);
-    }
-    .profile-title {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      margin-top: 3px;
-    }
-    .profile-desc {
-      font-size: 14px;
-      line-height: 1.65;
-      color: var(--ink-2);
-    }
-    .profile-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 18px; }
-    .profile-tag {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 0.06em;
-      padding: 3px 9px;
-      border-radius: 4px;
-      background: var(--surface);
-      color: var(--ink-3);
-    }
-    .profile-voice-label {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--ink-3);
-      margin-top: 20px;
-      margin-bottom: 8px;
-    }
-    .voice-bars { display: flex; align-items: flex-end; gap: 3px; height: 24px; }
-    .vbar {
-      width: 4px;
-      border-radius: 2px;
-      background: var(--border-bright);
-      transition: height 0.3s var(--ease-out);
-    }
-    .profile-peer .vbar { background: rgba(125,176,107,0.5); }
-    .profile-lead .vbar { background: rgba(201,168,76,0.5); }
-    .profile-vet  .vbar { background: rgba(212,84,10,0.4); }
-
-    /* ─── HOW IT WORKS ───────────────────────── */
-    .how-section { padding: 96px 48px; }
-    .how-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 80px;
-      align-items: start;
-      margin-top: 64px;
-    }
-    .step-list { display: flex; flex-direction: column; gap: 0; }
-    .step-item {
-      display: flex;
-      gap: 20px;
-      padding: 24px 0;
-      border-bottom: 1px solid var(--border);
-      cursor: pointer;
-      transition: padding-left 0.25s var(--ease-out);
-    }
-    .step-item:first-child { border-top: 1px solid var(--border); }
-    .step-item:hover, .step-item.active { padding-left: 8px; }
-    .step-num {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--ink-3);
-      letter-spacing: 0.06em;
-      padding-top: 4px;
-      flex-shrink: 0;
-      width: 24px;
-    }
-    .step-item.active .step-num { color: var(--gold); }
-    .step-content { flex: 1; }
-    .step-title {
-      font-family: var(--font-display);
-      font-weight: 600;
-      font-size: 17px;
-      color: var(--ink-2);
-      transition: color 0.2s;
-    }
-    .step-item.active .step-title, .step-item:hover .step-title { color: var(--ink); }
-    .step-desc {
-      font-size: 14px;
-      color: var(--ink-3);
-      margin-top: 8px;
-      line-height: 1.6;
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.4s var(--ease-out), color 0.2s;
-    }
-    .step-item.active .step-desc { max-height: 120px; color: var(--ink-2); }
-
-    .how-visual {
-      position: sticky;
-      top: 120px;
-    }
-    .visual-frame {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--r16);
-      overflow: hidden;
-    }
-    .vf-header {
-      background: var(--surface-2);
-      border-bottom: 1px solid var(--border);
-      padding: 14px 18px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--ink-3);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .vf-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
-    .vf-body { padding: 24px; min-height: 280px; display: flex; flex-direction: column; gap: 14px; }
-    .vf-panel { display: none; animation: fadeUp 0.4s var(--ease-out) forwards; }
-    .vf-panel.active { display: flex; flex-direction: column; gap: 14px; }
-
-    /* ─── REPORT PREVIEW ─────────────────────── */
-    .report-card {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--r8);
-      padding: 16px;
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-    }
-    .rc-score {
-      font-family: var(--font-display);
-      font-weight: 800;
-      font-size: 28px;
-      color: var(--gold);
-      min-width: 52px;
-    }
-    .rc-info { flex: 1; }
-    .rc-question {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--ink-3);
-      margin-bottom: 4px;
-    }
-    .rc-answer { font-size: 13px; color: var(--ink-2); line-height: 1.5; }
-
-    /* ─── CTA ────────────────────────────────── */
-    .cta-section {
-      padding: 96px 48px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .cta-section::before {
-      content: '';
-      position: absolute;
-      width: 800px; height: 400px;
-      background: radial-gradient(ellipse, rgba(201,168,76,0.07) 0%, transparent 70%);
-      left: 50%; top: 50%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-    }
-    .cta-label {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 16px;
-    }
-    .cta-title {
-      font-family: var(--font-display);
-      font-size: clamp(36px, 5vw, 64px);
-      font-weight: 800;
-      letter-spacing: -2px;
-      color: var(--ink);
-      line-height: 1.05;
-      max-width: 700px;
-      margin: 0 auto 16px;
-    }
-    .cta-title em { font-style: italic; font-family: var(--font-body); font-weight: 300; color: var(--gold); }
-    .cta-sub { color: var(--ink-2); font-size: 17px; max-width: 460px; margin: 0 auto 40px; }
-    .cta-actions { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
-    .cta-note {
-      margin-top: 24px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 0.06em;
-      color: var(--ink-3);
-    }
-
-    /* ─── FOOTER ─────────────────────────────── */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 40px 48px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .footer-logo {
-      font-family: var(--font-display);
-      font-weight: 800;
-      font-size: 16px;
-      color: var(--ink-2);
-    }
-    .footer-note {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--ink-3);
-      letter-spacing: 0.06em;
-    }
-    .footer-links {
-      display: flex;
-      gap: 28px;
-      list-style: none;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 0.06em;
-      color: var(--ink-3);
-    }
-    .footer-links a:hover { color: var(--ink-2); }
-
-    /* ─── ANIMATIONS ─────────────────────────── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeLeft {
-      from { opacity: 0; transform: translateX(30px); }
-      to   { opacity: 1; transform: translateX(0); }
-    }
-    @keyframes blink {
-      0%, 100% { opacity: 1; } 50% { opacity: 0; }
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.7); }
-    }
-    @keyframes waveAnim {
-      0%, 100% { height: 4px; }
-      50% { height: 16px; }
-    }
-    @keyframes marquee {
-      from { transform: translateX(0); }
-      to   { transform: translateX(-50%); }
-    }
-
-    /* ─── SCROLL-REVEAL ──────────────────────── */
-    .reveal {
-      opacity: 0;
-      transform: translateY(28px);
-      transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
-    }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-    .reveal-delay-1 { transition-delay: 0.15s; }
-    .reveal-delay-2 { transition-delay: 0.3s; }
-    .reveal-delay-3 { transition-delay: 0.45s; }
-
-    /* ─── RESPONSIVE ─────────────────────────── */
-    @media (max-width: 1024px) {
-      .hero { grid-template-columns: 1fr; padding: 100px 32px 60px; }
-      .hero-panel { display: none; }
-      .agents-row { grid-template-columns: 1fr; }
-      .how-grid { grid-template-columns: 1fr; }
-      .how-visual { position: static; }
-      nav { padding: 16px 32px; }
-      .section { padding: 72px 32px; }
-      .agents-section { padding: 72px 32px; }
-      footer { flex-direction: column; gap: 24px; text-align: center; }
-      .nav-links { display: none; }
-    }
-    @media (max-width: 768px) {
-      .bento-grid { grid-template-columns: 1fr; }
-      .span-4, .span-5, .span-3, .span-7, .span-5r, .span-4r, .span-3r, .span-6, .span-12 {
-        grid-column: span 1; grid-row: span 1;
-      }
-      .cta-section { padding: 72px 24px; }
-    }
-  </style>
+/* RESPONSIVE */
+@media(max-width:900px){
+  .front{grid-template-columns:1fr;}
+  .front-aside{border-top:2px solid var(--ink);padding:24px 32px;}
+  .front-main{border-right:none;}
+  .columns{grid-template-columns:1fr 1fr;}
+  .agents-spread{grid-template-columns:1fr;}
+  .agent-spread-card{border-right:none;border-bottom:1px solid var(--rule);}
+  .flow-section{grid-template-columns:1fr;}.flow-rotlabel{display:none;}
+  .flow-inner{grid-template-columns:1fr 1fr;}
+  .stack-section{grid-template-columns:1fr;}.stack-left{border-right:none;border-bottom:2px solid var(--ink);}
+  .mast-center{grid-template-columns:1fr;}.mast-kicker,.mast-right{display:none;}
+  .mast-title{text-align:left;}
+  .footer-top{flex-direction:column;gap:16px;align-items:flex-start;}
+}
+@media(max-width:600px){
+  .columns{grid-template-columns:1fr;}
+  .flow-inner{grid-template-columns:1fr;}
+  .flow-arrow{display:none;}
+  .masthead,.broadsheet section,.stack-left,.stack-right,.front-main,.front-aside{padding-left:20px;padding-right:20px;}
+  .agents-hed{padding:16px 20px;}
+  .asc-body{padding:0 20px 20px;}
+}
+</style>
 </head>
 <body>
 
-<!-- Custom cursor -->
-<div id="cursor"></div>
-<div id="cursor-ring"></div>
-
-<!-- ─── NAV ──────────────────────────────────── -->
-<nav id="navbar">
-  <div class="nav-logo">
-    <div class="nav-logo-mark">
-      <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="7" cy="7" r="5.5" stroke="#0a0a08" stroke-width="1.5"/>
-        <circle cx="7" cy="7" r="2" fill="#0a0a08"/>
-      </svg>
-    </div>
-    InterviewOS
+<header class="masthead">
+  <div class="mast-top">
+    <span>VOL. 1 — EST. 2025</span>
+    <span id="live-date"></span>
+    <span>OPEN SOURCE · FREE</span>
   </div>
-  <ul class="nav-links">
-    <li><a href="#features">Features</a></li>
-    <li><a href="#agents">Agents</a></li>
-    <li><a href="#how">How it works</a></li>
-    <li><a href="https://github.com/HiwarkhedePrasad/cluely-killer-Interview-Platform" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-  </ul>
-  <a href="#cta" class="nav-cta">Get Started →</a>
-</nav>
-
-<!-- ─── HERO ──────────────────────────────────── -->
-<section class="hero">
-  <div class="hero-left">
-    <div class="hero-badge">Live AI Interview Platform</div>
-    <h1 class="hero-title">
-      Crack any<br />interview with<br /><em>3 AI Experts</em>
-    </h1>
-    <p class="hero-sub">
-      Voice-first technical interviews conducted by three specialized AI personas — each with their own style, expertise, and a voice you can recognize.
-    </p>
-    <div class="hero-actions">
-      <a href="#" class="btn-primary">
-        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm3.536 11.536L7 7.293V3h1.5v3.707l4.243 4.243-1.207 1.586z" opacity="0"/><path d="M3 8a5 5 0 110 10A5 5 0 013 8zm5-5h1v5.586l3.707 3.707-1.414 1.414L7 10.414V3z"/></svg>
-        Download App
-      </a>
-      <a href="https://github.com/HiwarkhedePrasad/cluely-killer-Interview-Platform" target="_blank" rel="noopener noreferrer" class="btn-ghost">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
-        View Source
-      </a>
+  <div class="mast-center">
+    <div class="mast-kicker">
+      <span>Breaking</span>
+      The interview process<br/>is broken. We fixed it.
     </div>
-    <div class="hero-stats">
-      <div class="stat-item">
-        <div class="stat-num">3</div>
-        <div class="stat-label">AI Agents</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">7</div>
-        <div class="stat-label">Languages</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">0</div>
-        <div class="stat-label">LeetCode</div>
-      </div>
+    <div class="mast-title">Interview<em>OS</em></div>
+    <div class="mast-right">
+      Local AI · No LeetCode<br/>
+      3 agents · 7 languages<br/>
+      Rust + Tauri Desktop
     </div>
   </div>
-
-  <div class="hero-panel">
-    <div class="panel-window">
-      <div class="panel-titlebar">
-        <div class="tbar-dots">
-          <span></span><span></span><span></span>
-        </div>
-        <div class="tbar-title">Interview in Progress — Session #2847</div>
-      </div>
-      <div class="panel-body">
-        <div class="agents-grid">
-          <div class="agent-card speaking" id="hero-agent-1">
-            <div class="agent-avatar av-peer">AC</div>
-            <div class="agent-info">
-              <div class="agent-name">Alex Chen</div>
-              <div class="agent-role">Peer · Junior Dev</div>
-            </div>
-            <div class="agent-wave">
-              <div class="wave-bar" style="height:6px"></div>
-              <div class="wave-bar" style="height:12px"></div>
-              <div class="wave-bar" style="height:8px"></div>
-              <div class="wave-bar" style="height:14px"></div>
-              <div class="wave-bar" style="height:6px"></div>
-            </div>
-          </div>
-          <div class="agent-card" id="hero-agent-2">
-            <div class="agent-avatar av-lead">SM</div>
-            <div class="agent-info">
-              <div class="agent-name">Sarah Mitchell</div>
-              <div class="agent-role">Team Lead · Tech Lead</div>
-            </div>
-            <div class="agent-wave">
-              <div class="wave-bar" style="height:4px"></div>
-              <div class="wave-bar" style="height:4px"></div>
-              <div class="wave-bar" style="height:4px"></div>
-              <div class="wave-bar" style="height:4px"></div>
-              <div class="wave-bar" style="height:4px"></div>
-            </div>
-          </div>
-          <div class="agent-card" id="hero-agent-3">
-            <div class="agent-avatar av-vet">JR</div>
-            <div class="agent-info">
-              <div class="agent-name">James Rodriguez</div>
-              <div class="agent-role">Veteran · Principal</div>
-            </div>
-            <div class="agent-wave">
-              <div class="wave-bar" style="height:4px"></div>
-              <div class="wave-bar" style="height:4px"></div>
-              <div class="wave-bar" style="height:4px"></div>
-              <div class="wave-bar" style="height:4px"></div>
-              <div class="wave-bar" style="height:4px"></div>
-            </div>
-          </div>
-        </div>
-        <div class="transcript-box" id="transcript-box">
-          <span class="t-agent">Alex → </span><span class="t-text" id="transcript-text"></span><span class="t-cursor"></span>
-        </div>
-      </div>
-    </div>
+  <div class="mast-bottom">
+    <div class="mast-tag red">● Live</div>
+    <div class="mast-tag">Voice-First</div>
+    <div class="mast-tag">Monaco Editor</div>
+    <div class="mast-tag">Ollama LLM</div>
+    <div class="mast-tag">Proctor Mode</div>
+    <div class="mast-tag">Resume Parsing</div>
+    <div class="mast-tag">AI Code Review</div>
   </div>
-</section>
+</header>
 
-<!-- ─── MARQUEE ────────────────────────────────── -->
-<div class="marquee-track">
-  <div class="marquee-inner" id="marquee">
-    <div class="marquee-item"><div class="marquee-dot"></div>Voice-First Interview</div>
-    <div class="marquee-item"><div class="marquee-dot"></div>Monaco Code Editor</div>
-    <div class="marquee-item"><div class="marquee-dot"></div>Resume Parsing</div>
-    <div class="marquee-item"><div class="marquee-dot"></div>Ollama LLM</div>
-    <div class="marquee-item"><div class="marquee-dot"></div>Tauri Desktop</div>
-    <div class="marquee-item"><div class="marquee-dot"></div>Screen Lockdown</div>
-    <div class="marquee-item"><div class="marquee-dot"></div>AI Code Review</div>
-    <div class="marquee-item"><div class="marquee-dot"></div>Interview Report</div>
-    <div class="marquee-item"><div class="marquee-dot"></div>No LeetCode</div>
-    <div class="marquee-item"><div class="marquee-dot"></div>3 AI Personas</div>
-    <!-- Duplicated for seamless loop -->
-    <div class="marquee-item"><div class="marquee-dot"></div>Voice-First Interview</div>
-    <div class="marquee-item"><div class="marquee-dot"></div>Monaco Code Editor</div>
-    <div class="marquee-item"><div class="marquee-dot"></div>Resume Parsing</div>
-    <div class="marquee-item"><div class="marquee-dot"></div>Ollama LLM</div>
-    <div class="marquee-item"><div class="marquee-dot"></div>Tauri Desktop</div>
-    <div class="marquee-item"><div class="marquee-dot"></div>Screen Lockdown</div>
-    <div class="marquee-item"><div class="marquee-dot"></div>AI Code Review</div>
-    <div class="marquee-item"><div class="marquee-dot"></div>Interview Report</div>
-    <div class="marquee-item"><div class="marquee-dot"></div>No LeetCode</div>
-    <div class="marquee-item"><div class="marquee-dot"></div>3 AI Personas</div>
+<div class="ticker">
+  <div class="ticker-inner">
+    <div class="ticker-item"><span class="ticker-sep">◆</span> 3 AI AGENTS SIMULTANEOUSLY</div>
+    <div class="ticker-item"><span class="ticker-sep">◆</span> ZERO LEETCODE QUESTIONS</div>
+    <div class="ticker-item"><span class="ticker-sep">◆</span> VOICE ACTIVITY DETECTION</div>
+    <div class="ticker-item"><span class="ticker-sep">◆</span> SCREEN CAPTURE EXCLUSION</div>
+    <div class="ticker-item"><span class="ticker-sep">◆</span> MONACO EDITOR BUILT IN</div>
+    <div class="ticker-item"><span class="ticker-sep">◆</span> LOCAL OLLAMA · FULL PRIVACY</div>
+    <div class="ticker-item"><span class="ticker-sep">◆</span> PDF RESUME PARSING</div>
+    <div class="ticker-item"><span class="ticker-sep">◆</span> SCORED INTERVIEW REPORT</div>
+    <div class="ticker-item"><span class="ticker-sep">◆</span> 3 AI AGENTS SIMULTANEOUSLY</div>
+    <div class="ticker-item"><span class="ticker-sep">◆</span> ZERO LEETCODE QUESTIONS</div>
+    <div class="ticker-item"><span class="ticker-sep">◆</span> VOICE ACTIVITY DETECTION</div>
+    <div class="ticker-item"><span class="ticker-sep">◆</span> SCREEN CAPTURE EXCLUSION</div>
+    <div class="ticker-item"><span class="ticker-sep">◆</span> MONACO EDITOR BUILT IN</div>
+    <div class="ticker-item"><span class="ticker-sep">◆</span> LOCAL OLLAMA · FULL PRIVACY</div>
+    <div class="ticker-item"><span class="ticker-sep">◆</span> PDF RESUME PARSING</div>
+    <div class="ticker-item"><span class="ticker-sep">◆</span> SCORED INTERVIEW REPORT</div>
   </div>
 </div>
 
-<!-- ─── FEATURES BENTO ─────────────────────────── -->
-<section class="section" id="features">
-  <div class="section-eyebrow reveal">Core Capabilities</div>
-  <h2 class="section-title reveal reveal-delay-1">Everything you need to<br /><em>simulate a real interview</em></h2>
+<div class="broadsheet">
 
-  <div class="bento-grid reveal reveal-delay-2">
-
-    <!-- Agents big card -->
-    <div class="bento-card span-5">
-      <div class="card-icon icon-gold">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+  <!-- FRONT PAGE -->
+  <section class="front">
+    <div class="front-main reveal-l">
+      <div class="overline">Platform announcement</div>
+      <h1 class="headline">
+        Three AI experts<br/>interview you.<br/><em>Simultaneously.</em>
+      </h1>
+      <p class="deck">
+        InterviewOS is a desktop application that runs a real voice interview — three distinct AI personas, each with their own voice and specialization, share conversation history and probe your actual project experience.
+      </p>
+      <div class="byline">by hiwarkhedeprasad &nbsp;·&nbsp; tauri 2 + react 19 + ollama</div>
+      <div class="terminal">
+        <div id="term-line-1"><span class="term-agent">[ Alex ] </span><span id="term-text-1"></span><span class="term-cursor" id="term-cur-1"></span></div>
+        <div id="term-line-2" style="display:none;margin-top:8px;"><span class="term-agent" style="color:#c87a50;">[ Sarah ] </span><span id="term-text-2"></span><span class="term-cursor" id="term-cur-2" style="display:none;"></span></div>
+        <div id="term-line-3" style="display:none;margin-top:8px;"><span class="term-agent" style="color:#9aaa88;">[ James ] </span><span id="term-text-3"></span><span class="term-cursor" id="term-cur-3" style="display:none;"></span></div>
       </div>
-      <div class="card-label">Intelligence</div>
-      <div class="card-title">3 Distinct AI Interviewers</div>
-      <div class="card-desc">Three personalities. Three voices. Three perspectives — from peer fundamentals to veteran edge cases.</div>
-      <div class="chip-row">
-        <span class="chip chip-sage">Peer · Alex</span>
-        <span class="chip chip-gold">Lead · Sarah</span>
-        <span class="chip chip-ember">Veteran · James</span>
-      </div>
-    </div>
-
-    <!-- Voice -->
-    <div class="bento-card span-4">
-      <div class="card-icon icon-sage">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg>
-      </div>
-      <div class="card-label">Voice System</div>
-      <div class="card-title">Continuous Voice Detection</div>
-      <div class="card-desc">Speak naturally. The platform auto-detects silence, detects interruptions, and responds in real-time.</div>
-    </div>
-
-    <!-- No DSA -->
-    <div class="bento-card span-3">
-      <div class="card-icon icon-ember">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </div>
-      <div class="card-label">Philosophy</div>
-      <div class="card-title">Zero LeetCode</div>
-      <div class="card-desc">Project-based. Experience-driven. No algorithmic grind.</div>
-    </div>
-
-    <!-- Code editor -->
-    <div class="bento-card span-7" style="position:relative; overflow:hidden;">
-      <div class="card-icon icon-gold">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-      </div>
-      <div class="card-label">Workspace</div>
-      <div class="card-title">Monaco Editor · 7 Languages</div>
-      <div class="card-desc">VS Code's editor, right in the app. JavaScript, TypeScript, Python, Java, C++, Go, Rust.</div>
-      <div class="mini-code">
-        <div><span class="kw">const</span> solve = (<span class="str">input</span>) <span class="kw">=></span> {</div>
-        <div>&nbsp;&nbsp;<span class="fn">return</span> input.<span class="str">filter</span>(x <span class="kw">=></span> x > 0);</div>
-        <div>};</div>
+      <div class="cta-strip">
+        <a href="#" class="btn-ink">↓ macOS</a>
+        <a href="#" class="btn-ink">↓ Windows</a>
+        <a href="#" class="btn-outline">GitHub →</a>
+        <span class="cta-note">MIT · Free · Requires Ollama</span>
       </div>
     </div>
 
-    <!-- Flow steps -->
-    <div class="bento-card span-5r">
-      <div class="card-label">Platform Flow</div>
-      <div class="card-title">4-Mode Interview Flow</div>
-      <div class="flow-steps" style="margin-top: 20px;">
-        <div class="flow-step active">
-          <div class="flow-step-dot">01</div>
-          <div class="flow-step-label">Setup</div>
+    <div class="front-aside reveal-r">
+      <div class="aside-block">
+        <div class="aside-label">The Panel</div>
+        <div class="agent-line">
+          <span class="agent-num">01</span>
+          <div><div class="agent-nm" style="color:var(--green);">Alex Chen</div><div class="agent-role-tag">Peer · Junior Dev · Fast Voice</div></div>
         </div>
-        <div class="flow-line"></div>
-        <div class="flow-step">
-          <div class="flow-step-dot">02</div>
-          <div class="flow-step-label">Video</div>
+        <div class="agent-line">
+          <span class="agent-num">02</span>
+          <div><div class="agent-nm" style="color:var(--red);">Sarah Mitchell</div><div class="agent-role-tag">Team Lead · Tech Lead · Mid Voice</div></div>
         </div>
-        <div class="flow-line"></div>
-        <div class="flow-step">
-          <div class="flow-step-dot">03</div>
-          <div class="flow-step-label">Code</div>
-        </div>
-        <div class="flow-line"></div>
-        <div class="flow-step">
-          <div class="flow-step-dot">04</div>
-          <div class="flow-step-label">Report</div>
+        <div class="agent-line">
+          <span class="agent-num">03</span>
+          <div><div class="agent-nm">James Rodriguez</div><div class="agent-role-tag">Veteran · Principal · Deep Voice</div></div>
         </div>
       </div>
-    </div>
-
-    <!-- Resume -->
-    <div class="bento-card span-4r">
-      <div class="card-icon icon-sage">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      <div class="aside-block">
+        <div class="aside-label">By the numbers</div>
+        <div class="stat-row"><span>AI Agents active</span><span class="stat-val">3</span></div>
+        <div class="stat-row"><span>Languages</span><span class="stat-val">7</span></div>
+        <div class="stat-row"><span>LeetCode questions</span><span class="stat-val">0</span></div>
+        <div class="stat-row"><span>Session modes</span><span class="stat-val">4</span></div>
+        <div class="stat-row"><span>Platform</span><span class="stat-val" style="font-size:14px;letter-spacing:0">Desktop</span></div>
       </div>
-      <div class="card-label">Personalization</div>
-      <div class="card-title">Resume Parsing</div>
-      <div class="card-desc">Upload PDF. AI auto-extracts skills, projects, experience.</div>
-    </div>
-
-    <!-- Scores -->
-    <div class="bento-card span-3r">
-      <div class="card-label">Post-Interview</div>
-      <div class="card-title">Scored Report</div>
-      <div class="score-list">
-        <div class="score-row">
-          <div class="score-label"><span>Technical Depth</span><span>8.4</span></div>
-          <div class="score-track"><div class="score-fill" style="--w:84%"></div></div>
-        </div>
-        <div class="score-row">
-          <div class="score-label"><span>Communication</span><span>9.1</span></div>
-          <div class="score-track"><div class="score-fill" style="--w:91%"></div></div>
-        </div>
-        <div class="score-row">
-          <div class="score-label"><span>Architecture</span><span>7.2</span></div>
-          <div class="score-track"><div class="score-fill" style="--w:72%"></div></div>
-        </div>
+      <div class="aside-block">
+        <div class="pullquote">"Your projects,<br/>not puzzles"</div>
+        <div style="font-size:11px;color:var(--ink-3);line-height:1.6;">All questions are project-based and experience-focused. The agents read your resume and ask about what you actually built.</div>
       </div>
     </div>
+  </section>
 
-    <!-- Lockdown -->
-    <div class="bento-card span-6">
-      <div class="card-icon icon-ember">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-      </div>
-      <div class="card-label">Security</div>
-      <div class="card-title">Proctor Lockdown Mode</div>
-      <div class="card-desc">Rust-powered screen capture exclusion on Windows & macOS. The window hides itself from screen recorders — no cheating tools can see it.</div>
+  <!-- FEATURES COLUMNS -->
+  <div class="features-hed reveal">
+    <div class="features-hed-inner">
+      <div class="section-hed">What's <em>inside</em></div>
+      <div class="section-count">05</div>
     </div>
-
-    <!-- Ollama -->
-    <div class="bento-card span-6">
-      <div class="card-icon icon-gold">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-      </div>
-      <div class="card-label">AI Engine</div>
-      <div class="card-title">Ollama — Local or Cloud LLM</div>
-      <div class="card-desc">Run Llama 3 locally for full privacy, or point at any Ollama-compatible cloud endpoint. Your data, your control.</div>
-    </div>
-
+    <hr style="border:none;border-top:2px solid var(--ink);"/>
   </div>
-</section>
-
-<!-- ─── AGENTS ─────────────────────────────────── -->
-<section class="agents-section" id="agents">
-  <div class="section-eyebrow reveal">Meet the Panel</div>
-  <h2 class="section-title reveal reveal-delay-1">Three <em>interviewers,</em><br />one session</h2>
-
-  <div class="agents-row">
-    <!-- Peer -->
-    <div class="agent-profile profile-peer reveal">
-      <div class="profile-header">
-        <div class="profile-avatar av-peer">AC</div>
-        <div class="profile-meta">
-          <div class="profile-name">Alex Chen</div>
-          <div class="profile-title" style="color: var(--sage-bright);">Peer Interviewer</div>
-        </div>
-      </div>
-      <div class="profile-desc">Junior developer energy. Alex asks about day-to-day fundamentals, communication, and how you approach problems in a team setting. Fast, friendly, high-pitched voice.</div>
-      <div class="profile-tags">
-        <span class="profile-tag">Fundamentals</span>
-        <span class="profile-tag">Communication</span>
-        <span class="profile-tag">Day-to-day Dev</span>
-        <span class="profile-tag">Team Collaboration</span>
-      </div>
-      <div class="profile-voice-label">Voice Profile</div>
-      <div class="voice-bars">
-        <div class="vbar" style="height:8px"></div>
-        <div class="vbar" style="height:16px"></div>
-        <div class="vbar" style="height:10px"></div>
-        <div class="vbar" style="height:20px"></div>
-        <div class="vbar" style="height:14px"></div>
-        <div class="vbar" style="height:18px"></div>
-        <div class="vbar" style="height:8px"></div>
-        <div class="vbar" style="height:22px"></div>
-        <div class="vbar" style="height:12px"></div>
-        <div class="vbar" style="height:16px"></div>
-        <div class="vbar" style="height:6px"></div>
-        <div class="vbar" style="height:14px"></div>
-      </div>
+  <div class="columns">
+    <div class="col reveal d1">
+      <div class="col-num">01</div>
+      <div class="col-title">Voice Interview Engine</div>
+      <div class="col-body">Web Speech API runs in continuous mode with interim results. VAD detects when you start talking and interrupts the agent mid-sentence. 1.5s of silence triggers the AI response cycle.</div>
+      <span class="col-tag col-tag-ink">Web Speech API</span>
     </div>
-
-    <!-- Lead -->
-    <div class="agent-profile profile-lead reveal reveal-delay-1">
-      <div class="profile-header">
-        <div class="profile-avatar av-lead">SM</div>
-        <div class="profile-meta">
-          <div class="profile-name">Sarah Mitchell</div>
-          <div class="profile-title" style="color: var(--gold);">Team Lead</div>
-        </div>
-      </div>
-      <div class="profile-desc">Tech Lead with a calm, measured voice. Sarah probes architectural decisions, trade-offs, and how you've navigated team dynamics under technical pressure.</div>
-      <div class="profile-tags">
-        <span class="profile-tag">Architecture</span>
-        <span class="profile-tag">Trade-offs</span>
-        <span class="profile-tag">System Design</span>
-        <span class="profile-tag">Team Leadership</span>
-      </div>
-      <div class="profile-voice-label">Voice Profile</div>
-      <div class="voice-bars">
-        <div class="vbar" style="height:12px"></div>
-        <div class="vbar" style="height:10px"></div>
-        <div class="vbar" style="height:18px"></div>
-        <div class="vbar" style="height:12px"></div>
-        <div class="vbar" style="height:20px"></div>
-        <div class="vbar" style="height:10px"></div>
-        <div class="vbar" style="height:14px"></div>
-        <div class="vbar" style="height:16px"></div>
-        <div class="vbar" style="height:10px"></div>
-        <div class="vbar" style="height:18px"></div>
-        <div class="vbar" style="height:12px"></div>
-        <div class="vbar" style="height:8px"></div>
-      </div>
+    <div class="col reveal d2">
+      <div class="col-num">02</div>
+      <div class="col-title">Monaco Code Workspace</div>
+      <div class="col-body">VS Code's editor embedded in the app. Resizable panels. JavaScript runs sandboxed with console capture. Test runner shows pass/fail. Ollama reviews your code for quality and correctness.</div>
+      <span class="col-tag col-tag-red">Monaco Editor</span>
     </div>
-
-    <!-- Veteran -->
-    <div class="agent-profile profile-vet reveal reveal-delay-2">
-      <div class="profile-header">
-        <div class="profile-avatar av-vet">JR</div>
-        <div class="profile-meta">
-          <div class="profile-name">James Rodriguez</div>
-          <div class="profile-title" style="color: var(--ember);">Veteran Principal</div>
-        </div>
-      </div>
-      <div class="profile-desc">Principal Engineer. Slow, deep, authoritative voice. James hunts for edge cases, production war stories, and the kind of experience that only comes from shipping at scale.</div>
-      <div class="profile-tags">
-        <span class="profile-tag">Edge Cases</span>
-        <span class="profile-tag">Production</span>
-        <span class="profile-tag">Deep Technical</span>
-        <span class="profile-tag">Scale</span>
-      </div>
-      <div class="profile-voice-label">Voice Profile</div>
-      <div class="voice-bars">
-        <div class="vbar" style="height:6px"></div>
-        <div class="vbar" style="height:14px"></div>
-        <div class="vbar" style="height:8px"></div>
-        <div class="vbar" style="height:18px"></div>
-        <div class="vbar" style="height:10px"></div>
-        <div class="vbar" style="height:20px"></div>
-        <div class="vbar" style="height:8px"></div>
-        <div class="vbar" style="height:12px"></div>
-        <div class="vbar" style="height:6px"></div>
-        <div class="vbar" style="height:16px"></div>
-        <div class="vbar" style="height:10px"></div>
-        <div class="vbar" style="height:14px"></div>
-      </div>
+    <div class="col reveal d3">
+      <div class="col-num">03</div>
+      <div class="col-title">Resume Parsing</div>
+      <div class="col-body">Drop a PDF. pdfjs extracts skills across 6 categories, up to 5 projects with detected tech stacks, and estimates your seniority level. Every question is contextualized to you.</div>
+      <span class="col-tag col-tag-grn">pdfjs-dist</span>
+    </div>
+    <div class="col reveal d4">
+      <div class="col-num">04</div>
+      <div class="col-title">Proctor Lockdown</div>
+      <div class="col-body">Rust backend: maximized, no decorations, always-on-top. Windows uses WDA_EXCLUDEFROMCAPTURE. macOS uses panel-level window. The app is invisible to screen recorders and capture tools.</div>
+      <span class="col-tag col-tag-red">Rust · WinAPI</span>
+    </div>
+    <div class="col reveal">
+      <div class="col-num">05</div>
+      <div class="col-title">Scored Report</div>
+      <div class="col-body">Per-question scores 1–10, candidate vs preferred answers, strength and weakness breakdown by topic, and a downloadable self-contained HTML file with print styles.</div>
+      <span class="col-tag col-tag-ink">HTML Export</span>
     </div>
   </div>
-</section>
 
-<!-- ─── HOW IT WORKS ────────────────────────────── -->
-<section class="how-section" id="how">
-  <div class="section-eyebrow reveal">The Process</div>
-  <h2 class="section-title reveal reveal-delay-1">From setup to<br /><em>signed offer</em></h2>
-
-  <div class="how-grid">
-    <div class="step-list reveal">
-      <div class="step-item active" data-step="0">
-        <div class="step-num">01</div>
-        <div class="step-content">
-          <div class="step-title">Set Up Your Session</div>
-          <div class="step-desc">Enter your name, upload your PDF résumé, and let the platform extract your skills and project history automatically.</div>
+  <!-- AGENTS SPREAD -->
+  <section class="agents-section">
+    <div class="agents-hed reveal">
+      <div class="agents-hed-title">The Interview Panel</div>
+      <div class="agents-hed-sub">All three agents share conversation history — no question is ever repeated. A random agent responds, with 30% chance of a follow-up from a different one.</div>
+    </div>
+    <div class="agents-spread">
+      <div class="agent-spread-card reveal d1">
+        <div class="asc-top">
+          <div class="asc-initial init-peer">AC</div>
+          <div class="asc-tag">Peer Interviewer</div>
+        </div>
+        <div class="asc-body">
+          <div class="asc-wave peer-wave" id="wave-peer">
+            <div class="wbar" style="height:6px"></div><div class="wbar" style="height:12px"></div><div class="wbar" style="height:8px"></div><div class="wbar" style="height:18px"></div><div class="wbar" style="height:10px"></div><div class="wbar" style="height:14px"></div><div class="wbar" style="height:7px"></div><div class="wbar" style="height:16px"></div><div class="wbar" style="height:9px"></div><div class="wbar" style="height:11px"></div>
+          </div>
+          <div class="asc-name">Alex Chen</div>
+          <div class="asc-role">Junior Developer</div>
+          <div class="asc-desc">Fast, higher-pitched voice. Friendly energy. Alex asks about how you work day-to-day, communicate in a team, and your fundamentals.</div>
+          <div class="asc-focus"><b>Focus Areas</b><br/>Fundamentals · Communication · Day-to-day workflow</div>
         </div>
       </div>
-      <div class="step-item" data-step="1">
-        <div class="step-num">02</div>
-        <div class="step-content">
-          <div class="step-title">Enter the Video Interview</div>
-          <div class="step-desc">Join the live video session. All three AI agents are present. One speaks at a time, and 30% of the time another agent jumps in with a follow-up.</div>
+      <div class="agent-spread-card reveal d2">
+        <div class="asc-top">
+          <div class="asc-initial init-lead">SM</div>
+          <div class="asc-tag">Team Lead</div>
+        </div>
+        <div class="asc-body">
+          <div class="asc-wave lead-wave" id="wave-lead">
+            <div class="wbar" style="height:10px"></div><div class="wbar" style="height:14px"></div><div class="wbar" style="height:8px"></div><div class="wbar" style="height:16px"></div><div class="wbar" style="height:12px"></div><div class="wbar" style="height:10px"></div><div class="wbar" style="height:18px"></div><div class="wbar" style="height:8px"></div><div class="wbar" style="height:14px"></div><div class="wbar" style="height:10px"></div>
+          </div>
+          <div class="asc-name">Sarah Mitchell</div>
+          <div class="asc-role">Technical Lead</div>
+          <div class="asc-desc">Medium pace, professional tone. Sarah pushes on architectural decisions, forces you to justify trade-offs, and probes how you collaborate under pressure.</div>
+          <div class="asc-focus"><b>Focus Areas</b><br/>Architecture · Trade-offs · System design</div>
         </div>
       </div>
-      <div class="step-item" data-step="2">
-        <div class="step-num">03</div>
-        <div class="step-content">
-          <div class="step-title">Code in the Live Workspace</div>
-          <div class="step-desc">Switch to the coding challenge room. Monaco editor, resizable panels, code execution, test runner, and AI-powered code review — all in one place.</div>
+      <div class="agent-spread-card reveal d3">
+        <div class="asc-top">
+          <div class="asc-initial init-vet">JR</div>
+          <div class="asc-tag">Veteran</div>
         </div>
-      </div>
-      <div class="step-item" data-step="3">
-        <div class="step-num">04</div>
-        <div class="step-content">
-          <div class="step-title">Read Your Interview Report</div>
-          <div class="step-desc">Get a full breakdown: per-question scores (1–10), preferred answers, strengths, weaknesses, and a downloadable HTML report.</div>
+        <div class="asc-body">
+          <div class="asc-wave vet-wave" id="wave-vet">
+            <div class="wbar" style="height:8px"></div><div class="wbar" style="height:10px"></div><div class="wbar" style="height:14px"></div><div class="wbar" style="height:8px"></div><div class="wbar" style="height:18px"></div><div class="wbar" style="height:10px"></div><div class="wbar" style="height:8px"></div><div class="wbar" style="height:16px"></div><div class="wbar" style="height:10px"></div><div class="wbar" style="height:12px"></div>
+          </div>
+          <div class="asc-name">James Rodriguez</div>
+          <div class="asc-role">Principal Engineer</div>
+          <div class="asc-desc">Slow, deep, authoritative. James hunts for edge cases, production war stories, and whether you actually shipped anything hard at scale.</div>
+          <div class="asc-focus"><b>Focus Areas</b><br/>Edge cases · Production experience · Scale</div>
         </div>
       </div>
     </div>
+  </section>
 
-    <div class="how-visual reveal reveal-delay-1">
-      <div class="visual-frame">
-        <div class="vf-header">
-          <div class="vf-dot"></div>
-          <span id="vf-step-label">Step 01 — Setup</span>
+  <!-- FLOW -->
+  <section class="flow-section">
+    <div class="flow-rotlabel"><span>Interview Flow</span></div>
+    <div class="flow-inner">
+      <div class="flow-card reveal d1">
+        <div class="flow-index">01</div>
+        <div class="flow-mode">Setup</div>
+        <div class="flow-desc">Enter your name, drop your PDF résumé. Skills, projects, and experience level are extracted. Agents load your context before a single question is asked.</div>
+        <div class="flow-arrow">→</div>
+      </div>
+      <div class="flow-card reveal d2">
+        <div class="flow-index">02</div>
+        <div class="flow-mode">Video</div>
+        <div class="flow-desc">Full-screen video call. Camera, mic, screen share. 20-minute countdown. All three agents are live. VAD handles turn-taking — no buttons to click.</div>
+        <div class="flow-arrow">→</div>
+      </div>
+      <div class="flow-card reveal d3">
+        <div class="flow-index">03</div>
+        <div class="flow-mode">Coding</div>
+        <div class="flow-desc">Transition to Monaco workspace. Resizable panels: question sidebar, editor, output. Run code, see test results, get AI code review on demand.</div>
+        <div class="flow-arrow">→</div>
+      </div>
+      <div class="flow-card reveal d4">
+        <div class="flow-index">04</div>
+        <div class="flow-mode">Report</div>
+        <div class="flow-desc">Rust backend generates a full report: per-question scores, preferred answers, topic-level strengths and weaknesses. Download as self-contained HTML.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TECH + REPORT -->
+  <section class="stack-section">
+    <div class="stack-left reveal-l">
+      <div class="stack-hed">Tech <em>Stack</em></div>
+      <table class="tech-table">
+        <tr><td>Frontend</td><td><span class="tech-badge">React 19</span><span class="tech-badge">Vite 7</span></td></tr>
+        <tr><td>Desktop</td><td><span class="tech-badge red">Tauri 2</span><span class="tech-badge">Rust</span></td></tr>
+        <tr><td>Editor</td><td><span class="tech-badge">Monaco</span></td></tr>
+        <tr><td>AI / LLM</td><td><span class="tech-badge grn">Ollama</span> Local or Cloud</td></tr>
+        <tr><td>Speech</td><td>Web Speech API + Synthesis</td></tr>
+        <tr><td>PDF</td><td><span class="tech-badge">pdfjs-dist</span></td></tr>
+        <tr><td>Output</td><td>.msi · .dmg · .deb</td></tr>
+      </table>
+    </div>
+    <div class="stack-right reveal-r">
+      <div class="stack-hed">Sample <em>Report</em></div>
+      <div class="score-card">
+        <div class="sc-num sc-hi">9.1</div>
+        <div class="sc-info">
+          <div class="sc-topic">System Design</div>
+          <div class="sc-text">Strong architectural reasoning. Justified the caching decision with concrete trade-offs.</div>
         </div>
-        <div class="vf-body">
-
-          <!-- Panel 0: Setup -->
-          <div class="vf-panel active" id="vf-panel-0">
-            <div style="font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 4px;">Resume Upload</div>
-            <div style="background: var(--bg); border: 1px dashed var(--border-bright); border-radius: 8px; padding: 24px; text-align: center; color: var(--ink-3); font-family: var(--font-mono); font-size: 12px;">
-              <div style="font-size: 24px; margin-bottom: 8px;">📄</div>
-              Drop PDF here or click to browse
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-              <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; font-family: var(--font-mono); font-size: 11px; color: var(--ink-2);">
-                <span style="color: var(--sage-bright);">✓</span> &nbsp;Skills extracted: React, Node.js, Python, AWS
-              </div>
-              <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; font-family: var(--font-mono); font-size: 11px; color: var(--ink-2);">
-                <span style="color: var(--sage-bright);">✓</span> &nbsp;Projects found: 3
-              </div>
-              <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; font-family: var(--font-mono); font-size: 11px; color: var(--ink-2);">
-                <span style="color: var(--gold);">→</span> &nbsp;Level: Mid-Senior (3–5 yrs)
-              </div>
-            </div>
-          </div>
-
-          <!-- Panel 1: Video -->
-          <div class="vf-panel" id="vf-panel-1">
-            <div style="font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 4px;">Live Session</div>
-            <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; display: flex; gap: 12px; align-items: center;">
-              <div style="width: 48px; height: 48px; background: rgba(201,168,76,0.15); border-radius: 50%; display: grid; place-items: center; font-family: var(--font-display); font-weight: 700; color: var(--gold);">SM</div>
-              <div style="flex: 1;">
-                <div style="font-family: var(--font-display); font-weight: 600; font-size: 13px; color: var(--ink);">Sarah Mitchell is asking...</div>
-                <div style="font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); margin-top: 4px;">"Walk me through an architecture decision you made — what were the trade-offs?"</div>
-              </div>
-            </div>
-            <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-family: var(--font-mono); font-size: 11px; color: var(--ink-3);">
-              <span style="color: var(--gold);">● REC</span> &nbsp;·&nbsp; 00:04:32 &nbsp;·&nbsp; Silence: 0.8s
-            </div>
-          </div>
-
-          <!-- Panel 2: Code -->
-          <div class="vf-panel" id="vf-panel-2">
-            <div style="font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 4px;">Coding Challenge</div>
-            <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; font-family: var(--font-mono); font-size: 11px; line-height: 1.7; color: var(--ink-2);">
-              <span style="color: var(--gold);">// Task: Flatten nested object</span><br/>
-              <span style="color: var(--sage-bright);">function</span> <span style="color: var(--ember);">flatten</span>(obj, prefix = '') {<br/>
-              &nbsp;&nbsp;<span style="color: var(--gold);">return</span> Object.entries(obj)...<br/>
-              }
-            </div>
-            <div style="display: flex; gap: 8px;">
-              <div style="flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; font-family: var(--font-mono); font-size: 10px; color: var(--sage-bright);">✓ Test 1 passed</div>
-              <div style="flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; font-family: var(--font-mono); font-size: 10px; color: var(--ember);">✗ Test 2 failed</div>
-            </div>
-          </div>
-
-          <!-- Panel 3: Report -->
-          <div class="vf-panel" id="vf-panel-3">
-            <div style="font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 4px;">Interview Report</div>
-            <div class="report-card">
-              <div class="rc-score">8.4</div>
-              <div class="rc-info">
-                <div class="rc-question">Q → Architecture & Trade-offs</div>
-                <div class="rc-answer">Good specific answer with concrete examples and clear reasoning about the caching layer decision.</div>
-              </div>
-            </div>
-            <div style="display: flex; gap: 8px;">
-              <div style="flex: 1; background: rgba(92,122,78,0.1); border: 1px solid #3d5934; border-radius: 6px; padding: 8px 12px; font-family: var(--font-mono); font-size: 10px; color: var(--sage-bright);">Strength: System Design</div>
-              <div style="flex: 1; background: rgba(212,84,10,0.08); border: 1px solid #6b2d0a; border-radius: 6px; padding: 8px 12px; font-family: var(--font-mono); font-size: 10px; color: var(--ember);">Improve: Edge cases</div>
-            </div>
-          </div>
-
+      </div>
+      <div class="score-card">
+        <div class="sc-num sc-mid">6.4</div>
+        <div class="sc-info">
+          <div class="sc-topic">Edge Cases & Production</div>
+          <div class="sc-text">Answer was adequate but lacked war stories. More detail needed on root cause analysis.</div>
+        </div>
+      </div>
+      <div class="score-card">
+        <div class="sc-num sc-hi">8.7</div>
+        <div class="sc-info">
+          <div class="sc-topic">Communication</div>
+          <div class="sc-text">Explained complex concepts clearly. Good analogies. Would perform well cross-functionally.</div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ─── CTA ────────────────────────────────────── -->
-<section class="cta-section" id="cta">
-  <div class="cta-label reveal">Open Source · Free · Desktop</div>
-  <h2 class="cta-title reveal reveal-delay-1">Ready to <em>ace</em> your next tech interview?</h2>
-  <p class="cta-sub reveal reveal-delay-2">Download the desktop app, connect Ollama, and start your first session in under 5 minutes.</p>
-  <div class="cta-actions reveal reveal-delay-3">
-    <a href="#" class="btn-primary" style="font-size: 15px; padding: 16px 32px;">
-      Download for macOS
-    </a>
-    <a href="#" class="btn-primary" style="background: var(--surface); color: var(--ink); border: 1px solid var(--border); box-shadow: none;">
-      Download for Windows
-    </a>
-  </div>
-  <div class="cta-note reveal">Built with Tauri 2 · React 19 · Ollama · Rust</div>
-</section>
+</div>
 
-<!-- ─── FOOTER ─────────────────────────────────── -->
-<footer>
-  <div class="footer-logo">InterviewOS</div>
-  <ul class="footer-links">
-    <li><a href="https://github.com/HiwarkhedePrasad/cluely-killer-Interview-Platform" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-    <li><a href="#">Docs</a></li>
-    <li><a href="#">Releases</a></li>
-  </ul>
-  <div class="footer-note">Built by hiwarkhedeprasad · MIT License</div>
+<footer class="footer">
+  <div class="footer-top">
+    <div class="footer-logo">Interview<em>OS</em></div>
+    <ul class="footer-links">
+      <li><a href="#">GitHub</a></li>
+      <li><a href="#">Releases</a></li>
+      <li><a href="#">Docs</a></li>
+      <li><a href="#">MIT License</a></li>
+    </ul>
+  </div>
+  <div class="footer-bottom">
+    <span>Built by hiwarkhedeprasad · Tauri 2 + React 19 + Ollama + Rust</span>
+    <span id="footer-date"></span>
+  </div>
 </footer>
 
 <script>
-  /* ─── CURSOR ─────────────────────────── */
-  const cursor = document.getElementById('cursor');
-  const ring = document.getElementById('cursor-ring');
-  let mx = 0, my = 0, rx = 0, ry = 0;
+/* DATE */
+const now = new Date();
+document.getElementById('live-date').textContent = now.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();
+document.getElementById('footer-date').textContent = '© ' + now.getFullYear();
 
-  document.addEventListener('mousemove', e => {
-    mx = e.clientX; my = e.clientY;
-    cursor.style.left = mx + 'px';
-    cursor.style.top  = my + 'px';
-  });
+/* TYPEWRITER */
+const convos = [
+  {idx:0, text:"Tell me about the last project you shipped. What was your specific role?"},
+  {idx:1, text:"Interesting — what architectural trade-off did you make? Why that call?"},
+  {idx:2, text:"What broke in production? How long before you found the root cause?"},
+];
+let ci=0, chi=0;
+const els = [
+  {txt:document.getElementById('term-text-1'),cur:document.getElementById('term-cur-1'),line:document.getElementById('term-line-1')},
+  {txt:document.getElementById('term-text-2'),cur:document.getElementById('term-cur-2'),line:document.getElementById('term-line-2')},
+  {txt:document.getElementById('term-text-3'),cur:document.getElementById('term-cur-3'),line:document.getElementById('term-line-3')},
+];
 
-  function animRing() {
-    rx += (mx - rx) * 0.12;
-    ry += (my - ry) * 0.12;
-    ring.style.left = rx + 'px';
-    ring.style.top  = ry + 'px';
-    requestAnimationFrame(animRing);
+function typeChar(){
+  const c=convos[ci], el=els[ci];
+  if(chi===0){
+    el.line.style.display='block';
+    if(ci>0) els[ci-1].cur.style.display='none';
+    el.cur.style.display='inline-block';
   }
-  animRing();
-
-  document.querySelectorAll('a, button, .agent-card, .step-item, .bento-card').forEach(el => {
-    el.addEventListener('mouseenter', () => {
-      cursor.style.width = '18px';
-      cursor.style.height = '18px';
-      ring.style.width = '48px';
-      ring.style.height = '48px';
-      ring.style.opacity = '0.6';
-    });
-    el.addEventListener('mouseleave', () => {
-      cursor.style.width = '10px';
-      cursor.style.height = '10px';
-      ring.style.width = '36px';
-      ring.style.height = '36px';
-      ring.style.opacity = '1';
-    });
-  });
-
-  /* ─── NAVBAR SCROLL ───────────────────── */
-  const navbar = document.getElementById('navbar');
-  window.addEventListener('scroll', () => {
-    navbar.classList.toggle('scrolled', window.scrollY > 40);
-  });
-
-  /* ─── SCROLL REVEAL ───────────────────── */
-  const revealEls = document.querySelectorAll('.reveal');
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('visible');
-        // Trigger score bar animation
-        e.target.querySelectorAll('.score-fill').forEach(bar => {
-          bar.style.width = bar.style.getPropertyValue('--w') || '80%';
-          bar.classList.add('animated');
-        });
-      }
-    });
-  }, { threshold: 0.12 });
-
-  revealEls.forEach(el => observer.observe(el));
-
-  /* ─── SCORE BAR ANIMATION ─────────────── */
-  const scoreObserver = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.querySelectorAll('.score-fill').forEach((bar, i) => {
-          setTimeout(() => bar.classList.add('animated'), i * 150);
-        });
-      }
-    });
-  }, { threshold: 0.3 });
-  document.querySelectorAll('.score-list').forEach(el => scoreObserver.observe(el));
-
-  // Set actual widths
-  document.querySelectorAll('.score-fill').forEach(bar => {
-    const w = getComputedStyle(bar).getPropertyValue('--w').trim() || '80%';
-    bar.style.setProperty('--target-width', w);
-  });
-
-  /* ─── HERO TRANSCRIPT TYPEWRITER ─────── */
-  const lines = [
-    { agent: 'Alex', color: 'var(--sage-bright)', text: "Tell me about a project you worked on recently. What was your specific role?" },
-    { agent: 'Sarah', color: 'var(--gold)', text: "Interesting. What architectural decisions did you have to make, and why?" },
-    { agent: 'James', color: 'var(--ember)', text: "What edge cases did you encounter in production? How did you handle them?" },
-  ];
-  let lineIdx = 0, charIdx = 0;
-  const agentEl = document.querySelector('.t-agent');
-  const textEl = document.getElementById('transcript-text');
-  const agentCards = [
-    document.getElementById('hero-agent-1'),
-    document.getElementById('hero-agent-2'),
-    document.getElementById('hero-agent-3'),
-  ];
-
-  function setActiveAgent(idx) {
-    agentCards.forEach((c, i) => c.classList.toggle('speaking', i === idx));
-    agentEl.textContent = lines[idx].agent + ' → ';
-    agentEl.style.color = lines[idx].color;
-  }
-
-  function typeNext() {
-    const line = lines[lineIdx];
-    if (charIdx < line.text.length) {
-      textEl.textContent += line.text[charIdx++];
-      setTimeout(typeNext, 28 + Math.random() * 20);
-    } else {
-      setTimeout(() => {
-        textEl.textContent = '';
-        charIdx = 0;
-        lineIdx = (lineIdx + 1) % lines.length;
-        setActiveAgent(lineIdx);
-        typeNext();
-      }, 2400);
+  if(chi<c.text.length){
+    el.txt.textContent+=c.text[chi++];
+    setTimeout(typeChar,28+Math.random()*18);
+  } else {
+    el.cur.style.display='none';
+    if(ci<convos.length-1){ ci++; chi=0; setTimeout(typeChar,1800); }
+    else {
+      setTimeout(()=>{
+        els.forEach(e=>{e.txt.textContent='';e.line.style.display='none';e.cur.style.display='none';});
+        els[0].cur.style.display='inline-block'; els[0].line.style.display='block';
+        ci=0; chi=0; setTimeout(typeChar,400);
+      },3000);
     }
   }
-  setActiveAgent(0);
-  typeNext();
+}
+setTimeout(typeChar,800);
 
-  /* ─── BENTO CARD GLOW ─────────────────── */
-  document.querySelectorAll('.bento-card').forEach(card => {
-    card.addEventListener('mousemove', e => {
-      const rect = card.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 100;
-      const y = ((e.clientY - rect.top) / rect.height) * 100;
-      card.style.setProperty('--mx', x + '%');
-      card.style.setProperty('--my', y + '%');
-    });
-  });
+/* VOICE BARS */
+['wave-peer','wave-lead','wave-vet'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(!el)return;
+  setInterval(()=>{ el.querySelectorAll('.wbar').forEach(b=>{ b.style.height=(4+Math.random()*20)+'px'; }); },380);
+});
 
-  /* ─── HOW IT WORKS STEPS ──────────────── */
-  const steps = document.querySelectorAll('.step-item');
-  const panels = document.querySelectorAll('.vf-panel');
-  const vfLabel = document.getElementById('vf-step-label');
-  const stepLabels = ['Step 01 — Setup', 'Step 02 — Video Interview', 'Step 03 — Coding', 'Step 04 — Report'];
-
-  steps.forEach(step => {
-    step.addEventListener('click', () => {
-      const idx = parseInt(step.dataset.step);
-      steps.forEach(s => s.classList.remove('active'));
-      step.classList.add('active');
-      panels.forEach(p => p.classList.remove('active'));
-      panels[idx].classList.add('active');
-      vfLabel.textContent = stepLabels[idx];
-    });
-  });
-
-  /* ─── VOICE BARS ANIMATION ────────────── */
-  document.querySelectorAll('.voice-bars').forEach(bars => {
-    const vbars = bars.querySelectorAll('.vbar');
-    setInterval(() => {
-      vbars.forEach(b => {
-        b.style.height = (4 + Math.random() * 18) + 'px';
-      });
-    }, 400);
-  });
-
-  /* ─── FLOW STEP CYCLE ─────────────────── */
-  const flowSteps = document.querySelectorAll('.flow-step');
-  let flowIdx = 0;
-  setInterval(() => {
-    flowSteps.forEach(s => s.classList.remove('active'));
-    flowIdx = (flowIdx + 1) % flowSteps.length;
-    flowSteps[flowIdx].classList.add('active');
-  }, 1600);
-
+/* SCROLL REVEAL */
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); });
+},{threshold:0.1});
+document.querySelectorAll('.reveal,.reveal-l,.reveal-r').forEach(el=>obs.observe(el));
 </script>
 </body>
 </html>
